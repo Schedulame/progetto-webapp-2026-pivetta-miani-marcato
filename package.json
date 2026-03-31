@@ -1,0 +1,9 @@
+{
+  "name": "progetto-webapp-2024-cognome1-cognome2-cognome3",
+  "version": "1.0.0",
+  "description": "Progetto universitario - Bucket List Viaggi",
+  "main": "backend/server.js",
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
