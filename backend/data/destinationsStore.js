@@ -30,6 +30,38 @@ async function getAllDestinations() {
   }
 }
 
+async function getDestinationById(id) {
+  try {
+    const data = await readData();
+    return (data.destinations || []).find((d) => d.id === id) || null;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function createDestination(body, ownerId) {
+  try {
+    const data = await readData();
+    const nextId = data.nextId || 1;
+    const destination = {
+      id: nextId,
+      nome: body.nome,
+      paese: body.paese,
+      costo_stimato: body.costo_stimato,
+      durata_giorni: body.durata_giorni,
+      visitato: body.visitato,
+      ownerId,
+    };
+    data.destinations = data.destinations || [];
+    data.destinations.push(destination);
+    data.nextId = nextId + 1;
+    await writeData(data);
+    return destination;
+  } catch (error) {
+    throw error;
+  }
+}
+
 async function getUserByCredentials(username, password) {
   try {
     const data = await readData();
@@ -40,4 +72,6 @@ async function getUserByCredentials(username, password) {
   }
 }
 
-module.exports = { readData, writeData, getAllDestinations, getUserByCredentials };
+module.exports = {
+  readData, writeData, getAllDestinations, getDestinationById, createDestination, getUserByCredentials,
+};
