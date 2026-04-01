@@ -1,0 +1,8 @@
+{
+  "nextId": 1,
+  "destinations": [],
+  "users": [
+    { "id": 1, "username": "alice", "password": "pass123" },
+    { "id": 2, "username": "bob", "password": "secret456" }
+  ]
+}
