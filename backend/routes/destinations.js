@@ -3,6 +3,7 @@ const {
   getAllDestinations,
   getDestinationById,
   createDestination,
+  deleteDestination,
 } = require('../data/destinationsStore');
 const { validateDestination } = require('../validation/destinationsValidator');
 
@@ -44,6 +45,29 @@ router.post('/destinations', async (req, res) => {
       req.userId
     );
     res.status(201).json(destination);
+  } catch (error) {
+    res.status(500).json({ error: 'Errore interno del server' });
+  }
+});
+
+router.delete('/destinations/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const existing = await getDestinationById(id);
+    if (!existing) {
+      res.status(404).json({ error: 'Destination not found' });
+      return;
+    }
+    if (existing.ownerId !== req.userId) {
+      res.status(403).json({ error: 'Non sei il proprietario' });
+      return;
+    }
+    const deleted = await deleteDestination(id);
+    if (!deleted) {
+      res.status(404).json({ error: 'Destination not found' });
+      return;
+    }
+    res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: 'Errore interno del server' });
   }
