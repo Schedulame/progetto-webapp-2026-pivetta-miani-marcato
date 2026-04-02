@@ -2,7 +2,9 @@ const express = require('express');
 const {
   getAllDestinations,
   getDestinationById,
+  createDestination,
 } = require('../data/destinationsStore');
+const { validateDestination } = require('../validation/destinationsValidator');
 
 const router = express.Router();
 
@@ -24,6 +26,24 @@ router.get('/destinations/:id', async (req, res) => {
       return;
     }
     res.status(200).json(destination);
+  } catch (error) {
+    res.status(500).json({ error: 'Errore interno del server' });
+  }
+});
+
+router.post('/destinations', async (req, res) => {
+  try {
+    const errors = validateDestination(req.body || {});
+    if (errors.length > 0) {
+      res.status(400).json({ error: errors.join('; ') });
+      return;
+    }
+    const { nome, paese, costo_stimato, durata_giorni, visitato } = req.body;
+    const destination = await createDestination(
+      { nome, paese, costo_stimato, durata_giorni, visitato },
+      req.userId
+    );
+    res.status(201).json(destination);
   } catch (error) {
     res.status(500).json({ error: 'Errore interno del server' });
   }

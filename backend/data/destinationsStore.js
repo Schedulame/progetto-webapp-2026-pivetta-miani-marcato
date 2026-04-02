@@ -62,6 +62,66 @@ async function createDestination(body, ownerId) {
   }
 }
 
+async function createDestinationWithId(id, body, ownerId) {
+  try {
+    const data = await readData();
+    const destination = {
+      id,
+      nome: body.nome,
+      paese: body.paese,
+      costo_stimato: body.costo_stimato,
+      durata_giorni: body.durata_giorni,
+      visitato: body.visitato,
+      ownerId,
+    };
+    data.destinations = data.destinations || [];
+    data.destinations.push(destination);
+    const currentNextId = data.nextId || 1;
+    data.nextId = Math.max(currentNextId, id + 1);
+    await writeData(data);
+    return destination;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function updateDestination(id, body) {
+  try {
+    const data = await readData();
+    const destinations = data.destinations || [];
+    const index = destinations.findIndex((d) => d.id === id);
+    if (index === -1) return null;
+    const existing = destinations[index];
+    const updated = { ...existing };
+    if (Object.prototype.hasOwnProperty.call(body, 'nome')) updated.nome = body.nome;
+    if (Object.prototype.hasOwnProperty.call(body, 'paese')) updated.paese = body.paese;
+    if (Object.prototype.hasOwnProperty.call(body, 'costo_stimato')) updated.costo_stimato = body.costo_stimato;
+    if (Object.prototype.hasOwnProperty.call(body, 'durata_giorni')) updated.durata_giorni = body.durata_giorni;
+    if (Object.prototype.hasOwnProperty.call(body, 'visitato')) updated.visitato = body.visitato;
+    destinations[index] = updated;
+    data.destinations = destinations;
+    await writeData(data);
+    return updated;
+  } catch (error) {
+    throw error;
+  }
+}
+
+async function deleteDestination(id) {
+  try {
+    const data = await readData();
+    const destinations = data.destinations || [];
+    const initialLength = destinations.length;
+    data.destinations = destinations.filter((d) => d.id !== id);
+    const deleted = data.destinations.length !== initialLength;
+    if (!deleted) return false;
+    await writeData(data);
+    return true;
+  } catch (error) {
+    throw error;
+  }
+}
+
 async function getUserByCredentials(username, password) {
   try {
     const data = await readData();
@@ -73,5 +133,13 @@ async function getUserByCredentials(username, password) {
 }
 
 module.exports = {
-  readData, writeData, getAllDestinations, getDestinationById, createDestination, getUserByCredentials,
+  readData,
+  writeData,
+  getAllDestinations,
+  getDestinationById,
+  createDestination,
+  createDestinationWithId,
+  updateDestination,
+  deleteDestination,
+  getUserByCredentials,
 };
