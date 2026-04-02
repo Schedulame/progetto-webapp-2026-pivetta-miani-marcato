@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const express = require('express');
 const path = require('path');
+const destinationsRouter = require('./routes/destinations');
 const { getUserByCredentials } = require('./data/destinationsStore');
 
 const app = express();
@@ -41,6 +42,9 @@ function authMiddleware(req, res, next) {
     res.status(500).json({ error: 'Errore interno del server' });
   }
 }
+
+app.use('/destinations', authMiddleware);
+app.use(destinationsRouter);
 
 const port = process.env.PORT || 3000;
 app.listen(port);
