@@ -1,0 +1,35 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+input.touched:invalid {
+  border: 2px solid #ef4444;
+}
+
+input.touched:valid {
+  border: 2px solid #22c55e;
+}
+
+.feedback-error {
+  color: #c00;
+  background: #fff0f0;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #fecaca;
+}
+
+.feedback-error::before {
+  content: '⚠ ';
+}
+
+.feedback-success {
+  color: #166534;
+  background: #f0fdf4;
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #bbf7d0;
+}
+
+.feedback-success::before {
+  content: '✓ ';
+}
