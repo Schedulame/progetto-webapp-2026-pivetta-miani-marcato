@@ -28,7 +28,34 @@
 
   <main class="flex-1 max-w-5xl mx-auto w-full px-4 py-6 space-y-4">
     <div id="list-view" class="space-y-4">
-      <!-- contenuto da riempire -->
+
+      <!-- Login -->
+      <section id="login-section" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+        <h2 class="text-base font-semibold mb-3 text-slate-900">Accedi</h2>
+        <form id="login-form" class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
+          <div class="flex-1 flex flex-col gap-1">
+            <label for="login-username" class="text-xs font-medium text-slate-600">Username</label>
+            <input id="login-username" type="text" name="username" required
+              class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+          </div>
+          <div class="flex-1 flex flex-col gap-1">
+            <label for="login-password" class="text-xs font-medium text-slate-600">Password</label>
+            <input id="login-password" type="password" name="password" required
+              class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+          </div>
+          <button type="submit"
+            class="px-5 py-2 rounded-lg bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition-colors shrink-0">
+            Accedi
+          </button>
+        </form>
+      </section>
+
+      <!-- Lista destinazioni -->
+      <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5">
+        <h2 class="text-base font-semibold text-slate-900 mb-3">Destinazioni</h2>
+        <div id="destination-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+      </section>
+
     </div>
     <div id="detail-view" class="hidden space-y-4">
       <div id="detail-content" class="space-y-4"></div>
