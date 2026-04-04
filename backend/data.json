@@ -1,6 +1,34 @@
 {
-  "nextId": 1,
-  "destinations": [],
+  "nextId": 4,
+  "destinations": [
+    {
+      "id": 1,
+      "nome": "Tokyo",
+      "paese": "Giappone",
+      "costo_stimato": 2500,
+      "durata_giorni": 14,
+      "visitato": false,
+      "ownerId": 1
+    },
+    {
+      "id": 2,
+      "nome": "Lisbona",
+      "paese": "Portogallo",
+      "costo_stimato": 800,
+      "durata_giorni": 5,
+      "visitato": true,
+      "ownerId": 1
+    },
+    {
+      "id": 3,
+      "nome": "New York",
+      "paese": "USA",
+      "costo_stimato": 3200,
+      "durata_giorni": 10,
+      "visitato": false,
+      "ownerId": 2
+    }
+  ],
   "users": [
     { "id": 1, "username": "alice", "password": "pass123" },
     { "id": 2, "username": "bob", "password": "secret456" }
