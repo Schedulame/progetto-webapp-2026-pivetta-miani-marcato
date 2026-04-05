@@ -43,15 +43,9 @@ router.get('/destinations', async (req, res) => {
       });
     }
 
-    if (mine && requestingUserId !== null) {
-      filtered = filtered.filter((d) => d.ownerId === requestingUserId);
-    }
-
-    if (visitatoParam === 'true') {
-      filtered = filtered.filter((d) => d.visitato === true);
-    } else if (visitatoParam === 'false') {
-      filtered = filtered.filter((d) => d.visitato === false);
-    }
+    if (mine && requestingUserId !== null) filtered = filtered.filter((d) => d.ownerId === requestingUserId);
+    if (visitatoParam === 'true') filtered = filtered.filter((d) => d.visitato === true);
+    else if (visitatoParam === 'false') filtered = filtered.filter((d) => d.visitato === false);
 
     const total = filtered.length;
     const results = filtered.slice(offset, offset + limit);
@@ -65,10 +59,7 @@ router.get('/destinations/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
     const destination = await getDestinationById(id);
-    if (!destination) {
-      res.status(404).json({ error: 'Destination not found' });
-      return;
-    }
+    if (!destination) { res.status(404).json({ error: 'Destination not found' }); return; }
     res.status(200).json(destination);
   } catch (error) {
     res.status(500).json({ error: 'Errore interno del server' });
@@ -78,15 +69,9 @@ router.get('/destinations/:id', async (req, res) => {
 router.post('/destinations', async (req, res) => {
   try {
     const errors = validateDestination(req.body || {});
-    if (errors.length > 0) {
-      res.status(400).json({ error: errors.join('; ') });
-      return;
-    }
+    if (errors.length > 0) { res.status(400).json({ error: errors.join('; ') }); return; }
     const { nome, paese, costo_stimato, durata_giorni, visitato } = req.body;
-    const destination = await createDestination(
-      { nome, paese, costo_stimato, durata_giorni, visitato },
-      req.userId
-    );
+    const destination = await createDestination({ nome, paese, costo_stimato, durata_giorni, visitato }, req.userId);
     res.status(201).json(destination);
   } catch (error) {
     res.status(500).json({ error: 'Errore interno del server' });
@@ -99,15 +84,9 @@ router.put('/destinations/:id', async (req, res) => {
     const body = req.body || {};
     const existing = await getDestinationById(id);
     if (existing) {
-      if (existing.ownerId !== req.userId) {
-        res.status(403).json({ error: 'Non sei il proprietario' });
-        return;
-      }
+      if (existing.ownerId !== req.userId) { res.status(403).json({ error: 'Non sei il proprietario' }); return; }
       const errors = validatePartialDestination(body);
-      if (errors.length > 0) {
-        res.status(400).json({ error: errors.join('; ') });
-        return;
-      }
+      if (errors.length > 0) { res.status(400).json({ error: errors.join('; ') }); return; }
       const updated = await updateDestination(id, body);
       if (!updated) { res.status(404).json({ error: 'Destination not found' }); return; }
       res.status(200).json(updated);
@@ -132,6 +111,48 @@ router.delete('/destinations/:id', async (req, res) => {
     const deleted = await deleteDestination(id);
     if (!deleted) { res.status(404).json({ error: 'Destination not found' }); return; }
     res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ error: 'Errore interno del server' });
+  }
+});
+
+router.get('/destinations/:id/weather', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const destination = await getDestinationById(id);
+    if (!destination) { res.status(404).json({ error: 'Destination not found' }); return; }
+
+    const apiKey = process.env.OPENWEATHER_API_KEY;
+    if (!apiKey) { res.status(500).json({ error: 'Servizio meteo non configurato' }); return; }
+
+    const q = destination.nome + ',' + destination.paese;
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(q)}&appid=${apiKey}&units=metric&lang=it`;
+    const response = await fetch(url);
+
+    if (!response.ok) { res.status(404).json({ error: 'Meteo non disponibile per questa destinazione' }); return; }
+
+    const data = await response.json();
+    const temperatura = data?.main?.temp;
+    const descrizione = data?.weather?.[0]?.description;
+    const icona = data?.weather?.[0]?.icon;
+    const umidita = data?.main?.humidity;
+    const ventoMs = data?.wind?.speed;
+    const vento_kmh = typeof ventoMs === 'number' ? Math.round(ventoMs * 3.6) : null;
+
+    if (typeof temperatura !== 'number' || typeof descrizione !== 'string' || typeof icona !== 'string' || typeof umidita !== 'number' || vento_kmh === null) {
+      res.status(404).json({ error: 'Meteo non disponibile per questa destinazione' });
+      return;
+    }
+
+    res.status(200).json({
+      citta: destination.nome,
+      temperatura,
+      descrizione,
+      icona,
+      icona_url: `https://openweathermap.org/img/wn/${icona}@2x.png`,
+      umidita,
+      vento_kmh,
+    });
   } catch (error) {
     res.status(500).json({ error: 'Errore interno del server' });
   }
