@@ -128,10 +128,10 @@ router.get('/destinations/:id/weather', async (req, res) => {
     const q = destination.nome + ',' + destination.paese;
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(q)}&appid=${apiKey}&units=metric&lang=it`;
     const response = await fetch(url);
-
     if (!response.ok) { res.status(404).json({ error: 'Meteo non disponibile per questa destinazione' }); return; }
 
     const data = await response.json();
+    const citta = destination.nome;
     const temperatura = data?.main?.temp;
     const descrizione = data?.weather?.[0]?.description;
     const icona = data?.weather?.[0]?.icon;
@@ -144,17 +144,51 @@ router.get('/destinations/:id/weather', async (req, res) => {
       return;
     }
 
-    res.status(200).json({
-      citta: destination.nome,
-      temperatura,
-      descrizione,
-      icona,
-      icona_url: `https://openweathermap.org/img/wn/${icona}@2x.png`,
-      umidita,
-      vento_kmh,
-    });
+    res.status(200).json({ citta, temperatura, descrizione, icona, icona_url: `https://openweathermap.org/img/wn/${icona}@2x.png`, umidita, vento_kmh });
   } catch (error) {
     res.status(500).json({ error: 'Errore interno del server' });
+  }
+});
+
+router.post('/destinations/:id/itinerary', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const destination = await getDestinationById(id);
+    if (!destination) { res.status(404).json({ error: 'Destination not found' }); return; }
+
+    const apiKeyRaw = process.env.OPENAI_API_KEY;
+    const apiKey = String(apiKeyRaw || '').trim();
+    if (!apiKey) { res.status(500).json({ error: 'Servizio AI non configurato' }); return; }
+
+    const prompt = `Sei una guida turistica esperta. Crea un itinerario di viaggio per ${destination.nome}, ${destination.paese}.
+Durata del viaggio: ${destination.durata_giorni} giorni. Budget stimato: €${destination.costo_stimato}.
+Fornisci esattamente 3 attività consigliate per ogni giorno, in italiano, in formato JSON con questa struttura:
+{ "giorni": [{ "giorno": 1, "attivita": ["...", "...", "..."] }, ...] }`;
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [{ role: 'user', content: prompt }],
+        max_tokens: 2000,
+        response_format: { type: 'json_object' },
+      }),
+    });
+
+    if (!response.ok) { res.status(500).json({ error: 'Impossibile generare itinerario' }); return; }
+
+    const data = await response.json();
+    const content = data?.choices?.[0]?.message?.content;
+    let itinerary;
+    try {
+      itinerary = JSON.parse(content);
+    } catch (parseError) {
+      throw parseError;
+    }
+    res.status(200).json(itinerary);
+  } catch (error) {
+    res.status(500).json({ error: 'Impossibile generare itinerario' });
   }
 });
 
