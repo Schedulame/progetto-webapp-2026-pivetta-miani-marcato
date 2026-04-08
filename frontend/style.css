@@ -1,7 +1,9 @@
+/* Reset globale */
 *, *::before, *::after {
   box-sizing: border-box;
 }
 
+/* Pseudo-classi validazione form — mostrate solo dopo interazione */
 input.touched:invalid {
   border: 2px solid #ef4444;
 }
@@ -10,6 +12,14 @@ input.touched:valid {
   border: 2px solid #22c55e;
 }
 
+/* Focus visible per accessibilità */
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid dodgerblue;
+  outline-offset: 2px;
+}
+
+/* Feedback visivi */
 .feedback-error {
   color: #c00;
   background: #fff0f0;
@@ -32,4 +42,19 @@ input.touched:valid {
 
 .feedback-success::before {
   content: '✓ ';
+}
+
+/* Card destinazione — hover effect */
+.destination-card {
+  transition: box-shadow 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.destination-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.09);
+  border-color: #93c5fd;
+  transform: translateY(-1px);
+}
+
+.destination-card:active {
+  transform: translateY(0);
 }
