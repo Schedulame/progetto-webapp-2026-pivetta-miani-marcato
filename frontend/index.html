@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bucket List Viaggi</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
   <link rel="stylesheet" href="style.css">
   <script defer src="script.js"></script>
 </head>
@@ -13,21 +14,37 @@
   <header class="bg-white border-b border-slate-200 sticky top-0 z-10 shadow-sm">
     <nav class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
       <div class="flex items-center gap-3">
-        <span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-blue-500 text-white text-base select-none">✈</span>
+        <span class="inline-flex items-center justify-center w-9 h-9 rounded-full bg-blue-500 text-white text-base select-none"><i class="fa-solid fa-plane-departure"></i></span>
         <div>
           <span class="font-bold text-base text-slate-900 tracking-tight">Bucket List Viaggi</span>
           <p id="auth-status" class="text-xs text-slate-500 leading-none mt-0.5">Non autenticato</p>
         </div>
       </div>
-      <button id="logout-btn" type="button"
-        class="hidden px-3 py-1.5 rounded-lg bg-slate-800 text-white text-sm font-medium hover:bg-slate-700 transition-colors">
+      <button
+        id="logout-btn"
+        type="button"
+        class="hidden px-3 py-1.5 rounded-lg bg-slate-800 text-white text-sm font-medium hover:bg-slate-700 transition-colors"
+      >
         Esci
       </button>
     </nav>
   </header>
 
   <main class="flex-1 max-w-5xl mx-auto w-full px-4 py-6 space-y-4">
+
+    <!-- ===== LIST VIEW ===== -->
     <div id="list-view" class="space-y-4">
+
+      <!-- Hero (solo quando non loggato) -->
+      <div id="unauth-hero" class="hidden rounded-xl overflow-hidden shadow-sm relative">
+        <img src="assets/hero.jpg" alt="Esplora il mondo" class="w-full h-44 object-cover sm:h-56">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-5">
+          <div>
+            <p class="text-white font-bold text-xl drop-shadow">Pianifica i tuoi prossimi viaggi</p>
+            <p class="text-white/80 text-sm mt-0.5">Accedi per aggiungere e gestire le tue destinazioni</p>
+          </div>
+        </div>
+      </div>
 
       <!-- Login -->
       <section id="login-section" class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
@@ -35,13 +52,17 @@
         <form id="login-form" class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-end">
           <div class="flex-1 flex flex-col gap-1">
             <label for="login-username" class="text-xs font-medium text-slate-600">Username</label>
-            <input id="login-username" type="text" name="username" required
-              class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+            <input
+              id="login-username" type="text" name="username" required
+              class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+            >
           </div>
           <div class="flex-1 flex flex-col gap-1">
             <label for="login-password" class="text-xs font-medium text-slate-600">Password</label>
-            <input id="login-password" type="password" name="password" required
-              class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+            <input
+              id="login-password" type="password" name="password" required
+              class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+            >
           </div>
           <button type="submit"
             class="px-5 py-2 rounded-lg bg-blue-500 text-white text-sm font-semibold hover:bg-blue-600 transition-colors shrink-0">
@@ -53,13 +74,16 @@
       <!-- Cerca + Filtri -->
       <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5 space-y-3">
         <div class="flex gap-2">
-          <input type="text" id="search-input" placeholder="Cerca per nome o paese..."
-            class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+          <input
+            type="text" id="search-input" placeholder="Cerca per nome o paese..."
+            class="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
+          >
           <button id="search-btn" type="button"
             class="px-4 py-2 rounded-lg bg-slate-800 text-white text-sm font-medium hover:bg-slate-700 transition-colors shrink-0">
             Cerca
           </button>
         </div>
+        <!-- Filtri pill -->
         <div id="filter-bar" class="hidden flex flex-wrap gap-2">
           <button data-filter="all"
             class="filter-pill active px-3 py-1 rounded-full text-xs font-medium border transition-colors bg-blue-500 text-white border-blue-500">
@@ -97,7 +121,7 @@
         </div>
       </section>
 
-      <!-- Form nuova destinazione -->
+      <!-- Form nuova destinazione (solo se loggato) -->
       <section id="form-section" class="hidden bg-white rounded-xl shadow-sm border border-slate-200 p-4 sm:p-5">
         <h2 class="text-base font-semibold text-slate-900 mb-4">Aggiungi destinazione</h2>
         <form id="destination-form" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -136,10 +160,18 @@
       </section>
 
     </div>
+    <!-- END LIST VIEW -->
+
+    <!-- ===== DETAIL VIEW (hidden inizialmente) ===== -->
     <div id="detail-view" class="hidden space-y-4">
-      <div id="detail-content" class="space-y-4"></div>
+      <div id="detail-content" class="space-y-4">
+        <!-- Popolato dinamicamente da JS -->
+      </div>
     </div>
-    <div id="feedback" class="text-sm"></div>
+
+    <!-- Feedback visivo -->
+    <div id="feedback" role="alert" aria-live="polite" class="text-sm"></div>
+
   </main>
 
   <footer class="mt-auto py-4 text-center text-xs text-slate-400 border-t border-slate-200">
