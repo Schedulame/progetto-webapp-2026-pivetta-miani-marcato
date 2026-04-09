@@ -3,7 +3,7 @@
 // =====================
 let currentOffset = 0;
 const LIMIT = 6;
-let currentFilter = 'all';
+let currentFilter = 'all'; // 'all' | 'mine' | 'visited' | 'unvisited'
 
 // =====================
 // API FUNCTIONS
@@ -15,101 +15,151 @@ async function apiLogin(username, password) {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ username, password }),
   });
+
   if (!response.ok) {
     let message = 'Errore di login';
-    try { const data = await response.json(); if (data && data.error) message = data.error; } catch (_) {}
+    try {
+      const data = await response.json();
+      if (data && data.error) message = data.error;
+    } catch (_) {}
     throw new Error(message);
   }
+
   return response.json();
 }
 
 async function apiGetDestinations(q = '') {
   const params = new URLSearchParams();
   if (q) params.set('q', q);
-  params.set('limit', '1000');
+  params.set('limit', '1000'); // carica tutto, filtriamo lato client
   params.set('offset', '0');
+
   const response = await fetch(`/destinations?${params.toString()}`);
+
   if (!response.ok) {
     let message = 'Errore nel caricamento delle destinazioni';
-    try { const data = await response.json(); if (data && data.error) message = data.error; } catch (_) {}
+    try {
+      const data = await response.json();
+      if (data && data.error) message = data.error;
+    } catch (_) {}
     throw new Error(message);
   }
+
   return response.json();
 }
 
 async function apiGetDestinationById(id) {
   const response = await fetch(`/destinations/${id}`);
+
   if (!response.ok) {
     let message = 'Errore nel caricamento della destinazione';
-    try { const data = await response.json(); if (data && data.error) message = data.error; } catch (_) {}
+    try {
+      const data = await response.json();
+      if (data && data.error) message = data.error;
+    } catch (_) {}
     throw new Error(message);
   }
+
   return response.json();
 }
 
 async function apiGetDestinationWeather(id) {
   const response = await fetch(`/destinations/${id}/weather`);
+
   if (!response.ok) {
     let message = 'Errore nel caricamento del meteo';
-    try { const data = await response.json(); if (data && data.error) message = data.error; } catch (_) {}
+    try {
+      const data = await response.json();
+      if (data && data.error) message = data.error;
+    } catch (_) {}
     throw new Error(message);
   }
+
   return response.json();
 }
 
 async function apiGenerateItinerary(id) {
   const token = localStorage.getItem('authToken');
+
   const response = await fetch(`/destinations/${id}/itinerary`, {
     method: 'POST',
     headers: { 'X-Auth-Token': token || '' },
   });
+
   if (!response.ok) {
     let message = "Errore nella generazione dell'itinerario";
-    try { const data = await response.json(); if (data && data.error) message = data.error; } catch (_) {}
+    try {
+      const data = await response.json();
+      if (data && data.error) message = data.error;
+    } catch (_) {}
     throw new Error(message);
   }
+
   return response.json();
 }
 
 async function apiCreateDestination(data) {
   const token = localStorage.getItem('authToken');
+
   const response = await fetch('/destinations', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-Auth-Token': token || '' },
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Auth-Token': token || '',
+    },
     body: JSON.stringify(data),
   });
+
   if (!response.ok) {
     let message = 'Errore nella creazione della destinazione';
-    try { const body = await response.json(); if (body && body.error) message = body.error; } catch (_) {}
+    try {
+      const body = await response.json();
+      if (body && body.error) message = body.error;
+    } catch (_) {}
     throw new Error(message);
   }
+
   return response.json();
 }
 
 async function apiUpdateDestination(id, data) {
   const token = localStorage.getItem('authToken');
+
   const response = await fetch(`/destinations/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json', 'X-Auth-Token': token || '' },
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Auth-Token': token || '',
+    },
     body: JSON.stringify(data),
   });
+
   if (!response.ok) {
     let message = "Errore nell'aggiornamento della destinazione";
-    try { const body = await response.json(); if (body && body.error) message = body.error; } catch (_) {}
+    try {
+      const body = await response.json();
+      if (body && body.error) message = body.error;
+    } catch (_) {}
     throw new Error(message);
   }
+
   return response.json();
 }
 
 async function apiDeleteDestination(id) {
   const token = localStorage.getItem('authToken');
+
   const response = await fetch(`/destinations/${id}`, {
     method: 'DELETE',
     headers: { 'X-Auth-Token': token || '' },
   });
+
   if (!response.ok) {
     let message = "Errore nell'eliminazione della destinazione";
-    try { const body = await response.json(); if (body && body.error) message = body.error; } catch (_) {}
+    try {
+      const body = await response.json();
+      if (body && body.error) message = body.error;
+    } catch (_) {}
     throw new Error(message);
   }
 }
@@ -151,6 +201,7 @@ async function showDetailView(id) {
 function renderDestinations(results, total) {
   const list = document.getElementById('destination-list');
   if (!list) return;
+
   while (list.firstChild) list.removeChild(list.firstChild);
 
   if (results.length === 0) {
@@ -170,17 +221,21 @@ function renderDestinations(results, total) {
     card.className = 'destination-card rounded-xl border border-slate-200 bg-white p-4 flex flex-col gap-2 cursor-pointer';
     card.dataset.id = String(item.id);
 
+    // Header: titolo + badge (solo se loggato)
     const header = document.createElement('div');
     header.className = 'flex items-start justify-between gap-2';
 
     const titleBox = document.createElement('div');
     titleBox.className = 'min-w-0';
+
     const title = document.createElement('h3');
     title.className = 'font-semibold text-slate-900 text-sm truncate';
     title.textContent = item.nome;
+
     const country = document.createElement('p');
     country.className = 'text-xs text-slate-500 mt-0.5';
     country.textContent = item.paese;
+
     titleBox.appendChild(title);
     titleBox.appendChild(country);
     header.appendChild(titleBox);
@@ -198,18 +253,24 @@ function renderDestinations(results, total) {
       header.appendChild(badge);
     }
 
+    // Meta info
     const meta = document.createElement('div');
     meta.className = 'flex items-center gap-3 text-xs text-slate-500 mt-1';
+
     const cost = document.createElement('span');
     cost.textContent = formatCurrencyEUR(item.costo_stimato);
+
     const sep = document.createElement('span');
     sep.textContent = '·';
+
     const duration = document.createElement('span');
     duration.textContent = `${item.durata_giorni} giorni`;
+
     meta.appendChild(cost);
     meta.appendChild(sep);
     meta.appendChild(duration);
 
+    // Footer: indicatore "clicca per dettagli"
     const footer = document.createElement('div');
     footer.className = 'flex items-center justify-end mt-auto pt-1';
     const hint = document.createElement('span');
@@ -220,7 +281,11 @@ function renderDestinations(results, total) {
     card.appendChild(header);
     card.appendChild(meta);
     card.appendChild(footer);
-    card.addEventListener('click', () => { showDetailView(item.id).catch(() => {}); });
+
+    card.addEventListener('click', () => {
+      showDetailView(item.id).catch(() => {});
+    });
+
     fragment.appendChild(card);
   });
 
@@ -243,6 +308,7 @@ function renderPagination(total) {
   const start = currentOffset + 1;
   const end = Math.min(currentOffset + LIMIT, total);
   pageInfo.textContent = `${start}–${end} di ${total}`;
+
   prevBtn.disabled = currentOffset === 0;
   nextBtn.disabled = currentOffset + LIMIT >= total;
 }
@@ -251,15 +317,22 @@ async function loadDestinations() {
   try {
     const query = document.getElementById('search-input')?.value.trim() || '';
     const currentUserId = getCurrentUserId();
+
     const data = await apiGetDestinations(query);
     let results = data.results || [];
 
-    if (currentFilter === 'visited') results = results.filter((d) => d.visitato === true);
-    else if (currentFilter === 'unvisited') results = results.filter((d) => d.visitato === false);
-    else if (currentFilter === 'mine' && currentUserId !== null) results = results.filter((d) => d.ownerId === currentUserId);
+    // Filtro lato client
+    if (currentFilter === 'visited') {
+      results = results.filter((d) => d.visitato === true);
+    } else if (currentFilter === 'unvisited') {
+      results = results.filter((d) => d.visitato === false);
+    } else if (currentFilter === 'mine' && currentUserId !== null) {
+      results = results.filter((d) => d.ownerId === currentUserId);
+    }
 
     const total = results.length;
     const paginated = results.slice(currentOffset, currentOffset + LIMIT);
+
     renderDestinations(paginated, total);
     renderPagination(total);
   } catch (error) {
@@ -274,6 +347,7 @@ async function loadDestinations() {
 function setFilter(filter) {
   currentFilter = filter;
   currentOffset = 0;
+
   document.querySelectorAll('.filter-pill').forEach((btn) => {
     const isActive = btn.dataset.filter === filter;
     btn.classList.toggle('bg-blue-500', isActive);
@@ -283,6 +357,7 @@ function setFilter(filter) {
     btn.classList.toggle('text-slate-700', !isActive);
     btn.classList.toggle('border-slate-300', !isActive);
   });
+
   loadDestinations().catch(() => {});
 }
 
@@ -307,7 +382,10 @@ function updateAuthUI(isLoggedIn, username = '') {
   if (filterBar) filterBar.classList.toggle('hidden', !isLoggedIn);
   if (filterMine) filterMine.classList.toggle('hidden', !isLoggedIn);
 
-  if (!isLoggedIn && currentFilter === 'mine') setFilter('all');
+  // Se si fa logout mentre il filtro "mine" è attivo, torna a "Tutte"
+  if (!isLoggedIn && currentFilter === 'mine') {
+    setFilter('all');
+  }
 }
 
 // =====================
@@ -326,10 +404,16 @@ function clearFeedback() {
 function showError(message) {
   const feedback = document.getElementById('feedback');
   if (!feedback) return;
-  if (feedbackTimeoutId !== null) { window.clearTimeout(feedbackTimeoutId); feedbackTimeoutId = null; }
+
+  if (feedbackTimeoutId !== null) {
+    window.clearTimeout(feedbackTimeoutId);
+    feedbackTimeoutId = null;
+  }
+
   feedback.classList.remove('feedback-success', 'feedback-error', 'feedback-hide');
   feedback.classList.add('feedback-error');
   feedback.textContent = message;
+
   feedbackTimeoutId = window.setTimeout(() => {
     feedback.classList.add('feedback-hide');
     window.setTimeout(() => clearFeedback(), 500);
@@ -339,10 +423,16 @@ function showError(message) {
 function showSuccess(message) {
   const feedback = document.getElementById('feedback');
   if (!feedback) return;
-  if (feedbackTimeoutId !== null) { window.clearTimeout(feedbackTimeoutId); feedbackTimeoutId = null; }
+
+  if (feedbackTimeoutId !== null) {
+    window.clearTimeout(feedbackTimeoutId);
+    feedbackTimeoutId = null;
+  }
+
   feedback.classList.remove('feedback-success', 'feedback-error', 'feedback-hide');
   feedback.classList.add('feedback-success');
   feedback.textContent = message;
+
   feedbackTimeoutId = window.setTimeout(() => {
     feedback.classList.add('feedback-hide');
     window.setTimeout(() => clearFeedback(), 500);
@@ -357,6 +447,7 @@ async function loadDetailPage(id) {
   const content = document.getElementById('detail-content');
   if (!content) return;
   content.innerHTML = '<p class="text-slate-400 text-sm py-6 text-center">Caricamento...</p>';
+
   try {
     const dest = await apiGetDestinationById(id);
     const currentUserId = getCurrentUserId();
@@ -374,12 +465,17 @@ function renderDetailPage(dest, isOwner, isLoggedIn) {
   if (!content) return;
   content.innerHTML = '';
 
+  // --- Bottone torna alla lista ---
   const backBtn = document.createElement('button');
   backBtn.type = 'button';
   backBtn.textContent = '← Torna alla lista';
   backBtn.className = 'text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors';
-  backBtn.addEventListener('click', () => { showListView(); loadDestinations().catch(() => {}); });
+  backBtn.addEventListener('click', () => {
+    showListView();
+    loadDestinations().catch(() => {});
+  });
 
+  // --- Header card ---
   const headerCard = document.createElement('div');
   headerCard.className = 'bg-white rounded-xl shadow-sm border border-slate-200 p-5';
 
@@ -420,10 +516,17 @@ function renderDetailPage(dest, isOwner, isLoggedIn) {
   headerCard.appendChild(titleRow);
   headerCard.appendChild(meta);
 
+  // --- Sezione meteo ---
   const weatherCard = createWeatherSection(dest.id);
+
+  // --- Sezione itinerario (solo se loggato) ---
   const itineraryCard = isLoggedIn ? createItinerarySection(dest.id, dest.nome, dest.durata_giorni) : null;
+
+  // --- Sezione gestione (solo owner) ---
   let manageCard = null;
-  if (isOwner) manageCard = createManageSection(dest);
+  if (isOwner) {
+    manageCard = createManageSection(dest);
+  }
 
   content.appendChild(backBtn);
   content.appendChild(headerCard);
@@ -458,19 +561,24 @@ function createWeatherSection(id) {
       btn.textContent = 'Carica meteo';
       return;
     }
+
     btn.textContent = 'Caricamento...';
     btn.disabled = true;
     panel.classList.remove('hidden');
     panel.innerHTML = '<p class="text-xs text-slate-400 animate-pulse">Recupero dati meteo...</p>';
+
     try {
       const weather = await apiGetDestinationWeather(id);
       panel.innerHTML = '';
+
       const box = document.createElement('div');
       box.className = 'flex items-center gap-4 p-4 bg-blue-50 rounded-xl border border-blue-100';
+
       const iconImg = document.createElement('img');
       iconImg.src = weather.icona_url;
       iconImg.alt = weather.descrizione;
       iconImg.className = 'w-14 h-14 shrink-0';
+
       const left = document.createElement('div');
       const temp = document.createElement('p');
       temp.textContent = `${weather.temperatura} °C`;
@@ -480,13 +588,16 @@ function createWeatherSection(id) {
       desc.className = 'text-sm text-slate-600 capitalize mt-0.5';
       left.appendChild(temp);
       left.appendChild(desc);
+
       const right = document.createElement('div');
       right.className = 'ml-auto text-right text-xs text-slate-600 space-y-1';
       right.innerHTML = `<p>💧 Umidità: <strong>${weather.umidita}%</strong></p><p>💨 Vento: <strong>${weather.vento_kmh} km/h</strong></p>`;
+
       box.appendChild(iconImg);
       box.appendChild(left);
       box.appendChild(right);
       panel.appendChild(box);
+
       btn.textContent = 'Nascondi meteo';
     } catch (error) {
       panel.classList.add('hidden');
@@ -531,38 +642,49 @@ function createItinerarySection(id, nome, durata) {
       btn.textContent = 'Genera itinerario';
       return;
     }
+
     btn.textContent = 'Generazione...';
     btn.disabled = true;
     panel.classList.remove('hidden');
     panel.innerHTML = '<p class="text-xs text-slate-400 animate-pulse">Generazione in corso, attendi...</p>';
+
     try {
       const itinerary = await apiGenerateItinerary(id);
       const giorni = itinerary?.giorni;
       if (!Array.isArray(giorni)) throw new Error('Itinerario non valido');
+
       panel.innerHTML = '';
+
       const itTitle = document.createElement('p');
       itTitle.className = 'text-xs font-semibold text-slate-600 mb-1';
       itTitle.textContent = `Itinerario per ${nome} — ${durata} giorni`;
       panel.appendChild(itTitle);
+
       giorni.forEach((day) => {
         if (typeof day.giorno !== 'number' || !Array.isArray(day.attivita)) return;
+
         const dayDiv = document.createElement('div');
         dayDiv.className = 'rounded-lg border-l-4 border-indigo-400 bg-indigo-50 px-4 py-3';
+
         const dayTitle = document.createElement('p');
         dayTitle.className = 'text-xs font-bold text-indigo-700 mb-2 uppercase tracking-wide';
         dayTitle.textContent = `Giorno ${day.giorno}`;
+
         const ul = document.createElement('ul');
         ul.className = 'space-y-1';
+
         day.attivita.forEach((act) => {
           const li = document.createElement('li');
           li.className = 'text-xs text-slate-700 flex items-start gap-2';
           li.innerHTML = `<span class="text-indigo-400 font-bold shrink-0 mt-0.5">•</span><span>${String(act)}</span>`;
           ul.appendChild(li);
         });
+
         dayDiv.appendChild(dayTitle);
         dayDiv.appendChild(ul);
         panel.appendChild(dayDiv);
       });
+
       btn.textContent = 'Nascondi itinerario';
     } catch (error) {
       panel.classList.add('hidden');
@@ -585,6 +707,7 @@ function createManageSection(dest) {
   const card = document.createElement('div');
   card.className = 'bg-white rounded-xl shadow-sm border border-slate-200 p-5';
 
+  // Titolo + bottone elimina
   const titleRow = document.createElement('div');
   titleRow.className = 'flex items-center justify-between mb-4';
 
@@ -611,7 +734,9 @@ function createManageSection(dest) {
   titleRow.appendChild(title);
   titleRow.appendChild(deleteBtn);
 
+  // Form modifica
   const inputClass = 'w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white';
+
   const form = document.createElement('form');
   form.className = 'grid grid-cols-1 sm:grid-cols-2 gap-4';
 
@@ -625,24 +750,33 @@ function createManageSection(dest) {
   fields.forEach((f) => {
     const div = document.createElement('div');
     div.className = 'flex flex-col gap-1';
+
     const label = document.createElement('label');
     label.htmlFor = f.id;
     label.className = 'text-xs font-medium text-slate-600';
     label.textContent = f.label;
+
     const input = document.createElement('input');
     input.id = f.id;
     input.type = f.type;
     input.value = f.value;
     input.required = true;
     input.className = inputClass;
-    if (f.type === 'text') { input.minLength = parseInt(f.min); input.maxLength = parseInt(f.max); }
-    else { input.min = f.min; input.max = f.max; }
+    if (f.type === 'text') {
+      input.minLength = parseInt(f.min);
+      input.maxLength = parseInt(f.max);
+    } else {
+      input.min = f.min;
+      input.max = f.max;
+    }
     if (f.step) input.step = f.step;
+
     div.appendChild(label);
     div.appendChild(input);
     form.appendChild(div);
   });
 
+  // Checkbox visitato
   const checkDiv = document.createElement('div');
   checkDiv.className = 'flex items-center gap-2 mt-1';
   const checkInput = document.createElement('input');
@@ -658,6 +792,7 @@ function createManageSection(dest) {
   checkDiv.appendChild(checkLabel);
   form.appendChild(checkDiv);
 
+  // Bottone salva
   const submitDiv = document.createElement('div');
   submitDiv.className = 'flex justify-end sm:col-span-2 mt-1';
   const submitBtn = document.createElement('button');
@@ -670,6 +805,7 @@ function createManageSection(dest) {
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (!form.checkValidity()) { form.reportValidity(); return; }
+
     const data = {
       nome: document.getElementById('edit-nome').value.trim(),
       paese: document.getElementById('edit-paese').value.trim(),
@@ -677,6 +813,7 @@ function createManageSection(dest) {
       durata_giorni: parseInt(document.getElementById('edit-durata').value, 10),
       visitato: document.getElementById('edit-visitato').checked,
     };
+
     try {
       await apiUpdateDestination(dest.id, data);
       showSuccess('Destinazione aggiornata');
@@ -704,8 +841,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const prevBtn = document.getElementById('prev-btn');
   const nextBtn = document.getElementById('next-btn');
 
-  updateAuthUI(false);
+  // Ripristina sessione da localStorage
+  const storedToken = localStorage.getItem('authToken');
+  const storedUsername = localStorage.getItem('username') || '';
+  if (storedToken) {
+    updateAuthUI(true, storedUsername);
+  } else {
+    updateAuthUI(false);
+  }
 
+  // Validazione form "aggiungi" con classe touched
+  if (destinationForm) {
+    destinationForm.querySelectorAll('input').forEach((input) => {
+      if (input.type !== 'hidden') {
+        input.addEventListener('blur', () => input.classList.add('touched'));
+      }
+    });
+  }
+
+  // Login
   if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -726,6 +880,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Logout
   if (logoutBtn) {
     logoutBtn.addEventListener('click', async () => {
       localStorage.removeItem('authToken');
@@ -737,10 +892,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Crea nuova destinazione
   if (destinationForm) {
     destinationForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       if (!destinationForm.checkValidity()) { destinationForm.reportValidity(); return; }
+
       const data = {
         nome: String(destinationForm.elements.nome.value).trim(),
         paese: String(destinationForm.elements.paese.value).trim(),
@@ -748,10 +905,12 @@ document.addEventListener('DOMContentLoaded', () => {
         durata_giorni: parseInt(destinationForm.elements.durata_giorni.value, 10),
         visitato: Boolean(destinationForm.elements.visitato.checked),
       };
+
       try {
         await apiCreateDestination(data);
         showSuccess('Destinazione aggiunta');
         destinationForm.reset();
+        destinationForm.querySelectorAll('input').forEach((i) => i.classList.remove('touched'));
         await loadDestinations();
       } catch (error) {
         showError(error.message);
@@ -759,14 +918,45 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  if (searchBtn) searchBtn.addEventListener('click', () => { currentOffset = 0; loadDestinations().catch(() => {}); });
-  if (searchInput) searchInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { currentOffset = 0; loadDestinations().catch(() => {}); } });
-  if (prevBtn) prevBtn.addEventListener('click', () => { currentOffset = Math.max(0, currentOffset - LIMIT); loadDestinations().catch(() => {}); });
-  if (nextBtn) nextBtn.addEventListener('click', () => { currentOffset += LIMIT; loadDestinations().catch(() => {}); });
+  // Cerca
+  if (searchBtn) {
+    searchBtn.addEventListener('click', () => {
+      currentOffset = 0;
+      loadDestinations().catch(() => {});
+    });
+  }
 
+  // Cerca anche con Enter
+  if (searchInput) {
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        currentOffset = 0;
+        loadDestinations().catch(() => {});
+      }
+    });
+  }
+
+  // Paginazione
+  if (prevBtn) {
+    prevBtn.addEventListener('click', () => {
+      currentOffset = Math.max(0, currentOffset - LIMIT);
+      loadDestinations().catch(() => {});
+    });
+  }
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      currentOffset += LIMIT;
+      loadDestinations().catch(() => {});
+    });
+  }
+
+  // Filtri pill
   document.querySelectorAll('.filter-pill').forEach((btn) => {
-    btn.addEventListener('click', () => { setFilter(btn.dataset.filter); });
+    btn.addEventListener('click', () => {
+      setFilter(btn.dataset.filter);
+    });
   });
 
+  // Carica destinazioni all'avvio
   loadDestinations().catch(() => {});
 });
