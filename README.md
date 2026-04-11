@@ -73,3 +73,99 @@ Risposta:
   "total": 83
 }
 ```
+
+## Esempi curl
+
+### GET /destinations
+
+```bash
+curl -X GET "http://localhost:3000/destinations?q=tokyo&limit=10&offset=0"
+```
+
+### GET /destinations/:id
+
+```bash
+curl -X GET "http://localhost:3000/destinations/1"
+```
+
+### POST /destinations
+
+```bash
+curl -X POST "http://localhost:3000/destinations" \
+  -H "Content-Type: application/json" \
+  -H "X-Auth-Token: token-1" \
+  -d '{
+    "nome": "Roma",
+    "paese": "Italia",
+    "costo_stimato": 600,
+    "durata_giorni": 4,
+    "visitato": false
+  }'
+```
+
+### PUT /destinations/:id
+
+```bash
+curl -X PUT "http://localhost:3000/destinations/1" \
+  -H "Content-Type: application/json" \
+  -H "X-Auth-Token: token-1" \
+  -d '{
+    "costo_stimato": 2600,
+    "visitato": true
+  }'
+```
+
+### DELETE /destinations/:id
+
+```bash
+curl -X DELETE "http://localhost:3000/destinations/1" \
+  -H "X-Auth-Token: token-1"
+```
+
+### POST /login
+
+```bash
+curl -X POST "http://localhost:3000/login" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "alice",
+    "password": "pass123"
+  }'
+```
+
+### GET /destinations/:id/weather
+
+```bash
+curl -X GET "http://localhost:3000/destinations/1/weather"
+```
+
+### POST /destinations/:id/itinerary
+
+```bash
+curl -X POST "http://localhost:3000/destinations/1/itinerary" \
+  -H "X-Auth-Token: token-1"
+```
+
+## Struttura del progetto
+
+```text
+progetto-webapp-2024-cognome1-cognome2-cognome3/
+├── backend/
+│   ├── server.js
+│   ├── routes/
+│   │   └── destinations.js
+│   ├── data/
+│   │   └── destinationsStore.js
+│   ├── validation/
+│   │   └── destinationsValidator.js
+│   └── data.json
+├── frontend/
+│   ├── index.html
+│   ├── style.css
+│   └── script.js
+├── docs/
+├── .env
+├── .gitignore
+├── README.md
+└── README_TEST.md
+```
