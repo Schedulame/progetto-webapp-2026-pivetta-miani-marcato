@@ -169,3 +169,10 @@ progetto-webapp-2024-cognome1-cognome2-cognome3/
 ├── README.md
 └── README_TEST.md
 ```
+
+## Utenti di test
+
+| Username | Password |
+|----------|----------|
+| alice    | pass123  |
+| bob      | secret456 |
