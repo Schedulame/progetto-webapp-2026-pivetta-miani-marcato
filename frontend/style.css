@@ -44,6 +44,12 @@ input:focus-visible {
   content: '✓ ';
 }
 
+/* Animazione fade per il feedback */
+.feedback-hide {
+  opacity: 0;
+  transition: opacity 0.5s;
+}
+
 /* Card destinazione — hover effect */
 .destination-card {
   transition: box-shadow 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
