@@ -43,6 +43,7 @@ async function createDestination(body, ownerId) {
   try {
     const data = await readData();
     const nextId = data.nextId || 1;
+
     const destination = {
       id: nextId,
       nome: body.nome,
@@ -52,9 +53,11 @@ async function createDestination(body, ownerId) {
       visitato: body.visitato,
       ownerId,
     };
+
     data.destinations = data.destinations || [];
     data.destinations.push(destination);
     data.nextId = nextId + 1;
+
     await writeData(data);
     return destination;
   } catch (error) {
@@ -65,6 +68,7 @@ async function createDestination(body, ownerId) {
 async function createDestinationWithId(id, body, ownerId) {
   try {
     const data = await readData();
+
     const destination = {
       id,
       nome: body.nome,
@@ -74,10 +78,13 @@ async function createDestinationWithId(id, body, ownerId) {
       visitato: body.visitato,
       ownerId,
     };
+
     data.destinations = data.destinations || [];
     data.destinations.push(destination);
+
     const currentNextId = data.nextId || 1;
     data.nextId = Math.max(currentNextId, id + 1);
+
     await writeData(data);
     return destination;
   } catch (error) {
@@ -90,16 +97,33 @@ async function updateDestination(id, body) {
     const data = await readData();
     const destinations = data.destinations || [];
     const index = destinations.findIndex((d) => d.id === id);
-    if (index === -1) return null;
+
+    if (index === -1) {
+      return null;
+    }
+
     const existing = destinations[index];
     const updated = { ...existing };
-    if (Object.prototype.hasOwnProperty.call(body, 'nome')) updated.nome = body.nome;
-    if (Object.prototype.hasOwnProperty.call(body, 'paese')) updated.paese = body.paese;
-    if (Object.prototype.hasOwnProperty.call(body, 'costo_stimato')) updated.costo_stimato = body.costo_stimato;
-    if (Object.prototype.hasOwnProperty.call(body, 'durata_giorni')) updated.durata_giorni = body.durata_giorni;
-    if (Object.prototype.hasOwnProperty.call(body, 'visitato')) updated.visitato = body.visitato;
+
+    if (Object.prototype.hasOwnProperty.call(body, 'nome')) {
+      updated.nome = body.nome;
+    }
+    if (Object.prototype.hasOwnProperty.call(body, 'paese')) {
+      updated.paese = body.paese;
+    }
+    if (Object.prototype.hasOwnProperty.call(body, 'costo_stimato')) {
+      updated.costo_stimato = body.costo_stimato;
+    }
+    if (Object.prototype.hasOwnProperty.call(body, 'durata_giorni')) {
+      updated.durata_giorni = body.durata_giorni;
+    }
+    if (Object.prototype.hasOwnProperty.call(body, 'visitato')) {
+      updated.visitato = body.visitato;
+    }
+
     destinations[index] = updated;
     data.destinations = destinations;
+
     await writeData(data);
     return updated;
   } catch (error) {
@@ -113,8 +137,12 @@ async function deleteDestination(id) {
     const destinations = data.destinations || [];
     const initialLength = destinations.length;
     data.destinations = destinations.filter((d) => d.id !== id);
+
     const deleted = data.destinations.length !== initialLength;
-    if (!deleted) return false;
+    if (!deleted) {
+      return false;
+    }
+
     await writeData(data);
     return true;
   } catch (error) {
