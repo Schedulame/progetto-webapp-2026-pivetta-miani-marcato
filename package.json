@@ -1,9 +1,12 @@
 {
   "name": "progetto-webapp-2024-cognome1-cognome2-cognome3",
   "version": "1.0.0",
-  "description": "Progetto universitario - Bucket List Viaggi",
   "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js"
+  },
   "dependencies": {
+    "dotenv": "^16.4.5",
     "express": "^4.21.2"
   }
 }
