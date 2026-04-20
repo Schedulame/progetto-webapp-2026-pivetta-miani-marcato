@@ -1,4 +1,4 @@
-## Bucket List Viaggi — Progetto Applicazioni Web 2024/25
+## Bucket List Viaggi — Progetto Applicazioni Web 2025/26
 
 ## Descrizione
 
@@ -22,8 +22,8 @@ destinazioni di viaggio, con integrazione meteo e generazione itinerari AI.
 ## Installazione ed esecuzione
 
 ```bash
-git clone https://github.com/utente/progetto-webapp-2024-cognome1-cognome2-cognome3.git
-cd progetto-webapp-2024-cognome1-cognome2-cognome3
+git clone https://github.com/utente/progetto-webapp-2026-pivetta-miani-marcato.git
+cd progetto-webapp-2026-pivetta-miani-marcato
 npm install
 ```
 
@@ -149,7 +149,7 @@ curl -X POST "http://localhost:3000/destinations/1/itinerary" \
 ## Struttura del progetto
 
 ```text
-progetto-webapp-2024-cognome1-cognome2-cognome3/
+progetto-webapp-2026-pivetta-miani-marcato/
 ├── backend/
 │   ├── server.js
 │   ├── routes/
