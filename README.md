@@ -1,4 +1,4 @@
-## Bucket List Viaggi — Progetto Applicazioni Web 2025/26
+## Bucket List Viaggi - Progetto Applicazioni Web 2025/26
 
 ## Descrizione
 
@@ -8,9 +8,9 @@ destinazioni di viaggio, con integrazione meteo e generazione itinerari AI.
 
 ## Autori
 
-- Filippo Pivetta — Matricola: 157031
-- Gabriele Miani — Matricola: 157032
-- Francesco Marcato — Matricola: 157033
+- Filippo Pivetta - Matricola: 157031
+- Gabriele Miani - Matricola: 157032
+- Francesco Marcato - Matricola: 157033
 
 ## Tecnologie
 
