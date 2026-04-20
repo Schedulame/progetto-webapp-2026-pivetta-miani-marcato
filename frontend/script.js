@@ -28,13 +28,20 @@ async function apiLogin(username, password) {
   return response.json();
 }
 
-async function apiGetDestinations(q = '') {
+async function apiGetDestinations(q = '', limit = LIMIT, offset = 0, filter = 'all') {
   const params = new URLSearchParams();
   if (q) params.set('q', q);
-  params.set('limit', '1000'); // carica tutto, filtriamo lato client
-  params.set('offset', '0');
+  params.set('limit', String(limit));
+  params.set('offset', String(offset));
+  if (filter === 'visited') params.set('visitato', 'true');
+  else if (filter === 'unvisited') params.set('visitato', 'false');
+  else if (filter === 'mine') params.set('mine', 'true');
 
-  const response = await fetch(`/destinations?${params.toString()}`);
+  const token = localStorage.getItem('authToken');
+  const headers = {};
+  if (filter === 'mine' && token) headers['X-Auth-Token'] = token;
+
+  const response = await fetch(`/destinations?${params.toString()}`, { headers });
 
   if (!response.ok) {
     let message = 'Errore nel caricamento delle destinazioni';
@@ -318,22 +325,11 @@ async function loadDestinations() {
     const query = document.getElementById('search-input')?.value.trim() || '';
     const currentUserId = getCurrentUserId();
 
-    const data = await apiGetDestinations(query);
-    let results = data.results || [];
+    const data = await apiGetDestinations(query, LIMIT, currentOffset, currentFilter);
+    const results = data.results || [];
+    const total = data.total || 0;
 
-    // Filtro lato client
-    if (currentFilter === 'visited') {
-      results = results.filter((d) => d.visitato === true);
-    } else if (currentFilter === 'unvisited') {
-      results = results.filter((d) => d.visitato === false);
-    } else if (currentFilter === 'mine' && currentUserId !== null) {
-      results = results.filter((d) => d.ownerId === currentUserId);
-    }
-
-    const total = results.length;
-    const paginated = results.slice(currentOffset, currentOffset + LIMIT);
-
-    renderDestinations(paginated, total);
+    renderDestinations(results, total);
     renderPagination(total);
   } catch (error) {
     showError(error.message);
