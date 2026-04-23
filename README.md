@@ -9,8 +9,8 @@ destinazioni di viaggio, con integrazione meteo e generazione itinerari AI.
 ## Autori
 
 - Filippo Pivetta - Matricola: 157031
-- Gabriele Miani - Matricola: 157032
-- Francesco Marcato - Matricola: 157033
+- Gabriele Miani - Matricola: 158357
+- Francesco Marcato - Matricola: 153217
 
 ## Tecnologie
 
@@ -52,7 +52,7 @@ L'app è disponibile su `http://localhost:3000`.
 | PUT    | /destinations/:id             | Aggiorna o crea (upsert)      | Sì   | 200/201/400/403     |
 | DELETE | /destinations/:id             | Elimina destinazione          | Sì   | 204/403/404         |
 | POST   | /login                        | Autenticazione utente         | No   | 200/400/401         |
-| GET    | /destinations/:id/weather     | Meteo della destinazione      | No   | 200/404             |
+| GET    | /destinations/:id/weather     | Meteo della destinazione      | No   | 200/404/500         |
 | POST   | /destinations/:id/itinerary   | Genera itinerario AI          | Sì   | 200/404/500         |
 
 ## Parametri ricerca e paginazione
@@ -64,6 +64,8 @@ GET /destinations?q=tokyo&limit=10&offset=0
 - `q`: ricerca testuale su nome e paese (case-insensitive)
 - `limit`: numero massimo risultati (default: 10)
 - `offset`: indice di partenza (default: 0)
+- `visitato`: filtra per stato di visita (`true` o `false`)
+- `mine`: se `true`, restituisce solo le destinazioni dell'utente autenticato (richiede header `X-Auth-Token`)
 
 Risposta:
 
@@ -162,12 +164,12 @@ progetto-webapp-2026-pivetta-miani-marcato/
 ├── frontend/
 │   ├── index.html
 │   ├── style.css
-│   └── script.js
-├── docs/
+│   ├── script.js
+│   └── assets/
+│       └── hero.jpg
 ├── .env
 ├── .gitignore
-├── README.md
-└── README_TEST.md
+└── README.md
 ```
 
 ## Utenti di test
